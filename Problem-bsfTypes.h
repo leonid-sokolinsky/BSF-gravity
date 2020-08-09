@@ -8,6 +8,7 @@ This source code is a part of BSF Skeleton
 ==============================================================================*/
 #pragma once
 #include "Problem-Types.h"		// Problem Types 
+
 //=========================== BSF Types =========================
 struct PT_bsf_parameter_T {			// Parameter for workers
 	double coordinates[PP_SPACE_DIMENSION];
