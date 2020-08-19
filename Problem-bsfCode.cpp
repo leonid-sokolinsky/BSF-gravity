@@ -8,21 +8,13 @@ This source code is a part of BSF Skeleton
 ==============================================================================*/
 #include "Problem-Data.h"			// Problem Types 
 #include "Problem-Forwards.h"		// Problem Function Forwards
+#include "BSF-SkeletonVariables.h"	// Skeleton Variables
 using namespace std;
-
-//----------------------- Access to BSF-skeleton parameters  -----------------
-void PC_bsf_AssignAddressOffset(int value) { PP_BSF_addressOffset = value; };
-void PC_bsf_AssignIterCounter(int value) { PP_BSF_iterCounter = value; };
-void PC_bsf_AssignJobCase(int value) { PP_BSF_jobCase = value; };
-void PC_bsf_AssignMpiRank(int value) { PP_BSF_mpiRank = value; };
-void PC_bsf_AssignNumberInSublist(int value) { PP_BSF_numberInSublist = value; };
-void PC_bsf_AssignNumOfWorkers(int value) { PP_BSF_numOfWorkers = value; };
-void PC_bsf_AssignSublistLength(int value) { PP_BSF_sublistLength = value; };
 
 //----------------------- Predefined problem-dependent functions -----------------
 void PC_bsf_Init(bool* success) { // success=false if initialization is unsuccessful
 	if (PP_SPACE_DIMENSION != 3) {
-		if (PP_BSF_mpiRank == 0) {
+		if (BSF_sv_mpiRank == 0) {
 			cout << "Error PC_bsf_Init: PP_SPACE_DIMENSION must be equal to 3!" << endl;
 		}
 		*success = false;
@@ -46,21 +38,9 @@ void PC_bsf_Init(bool* success) { // success=false if initialization is unsucces
 	return;
 }
 
-void PC_bsf_AssignListSize(int* listSize) {
+void PC_bsf_SetListSize(int* listSize) {
 	*listSize = PP_N;
 };
-
-void PC_bsf_CopyParameter(PT_bsf_parameter_T* parameterIn, PT_bsf_parameter_T* parameterOut) {
-	for (int j = 0; j < PP_SPACE_DIMENSION; j++) {
-		parameterOut->coordinates[j] = parameterIn->coordinates[j];
-		parameterOut->velosity[j] = parameterIn->velosity[j];
-	}
-}
-
-void PC_bsf_SetParameter(PT_bsf_parameter_T* parameter) {
-	PD_coordinates = parameter->coordinates;
-	PD_velosity = parameter->velosity;
-}
 
 void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem,
 	int* success // 1 - reduceElem was produced successfully (default); 0 - otherwise
@@ -114,11 +94,11 @@ void PC_bsf_ReduceF_3(PT_bsf_reduceElem_T_3* x, PT_bsf_reduceElem_T_3* y, PT_bsf
 };
 
 void PC_bsf_ProcessResults(
-	bool* exit, // "true" if Stopping Criterion is satisfied, and "false" otherwise
 	PT_bsf_reduceElem_T* reduceResult,
 	int reduceCounter, // Number of successfully produced Elrments of Reduce List
 	PT_bsf_parameter_T* parameter, // Current Approximation
-	int* newJobCase
+	int* nextJob,
+	bool* exit // "true" if Stopping Criterion is satisfied, and "false" otherwise
 ) {
 	static int counter = 0;	// Iteration Counter
 	counter++;
@@ -134,38 +114,38 @@ void PC_bsf_ProcessResults(
 };
 
 void PC_bsf_ProcessResults_1(
-	bool* exit, // "true" if Stopping Criterion is satisfied, and "false" otherwise
 	PT_bsf_reduceElem_T_1* reduceResult,
 	int reduceCounter, // Number of successfully produced Elrments of Reduce List
 	PT_bsf_parameter_T* parameter, // Current Approximation
-	int* newJobCase
+	int* nextJob,
+	bool* exit // "true" if Stopping Criterion is satisfied, and "false" otherwise
 ) {
 	// optional filling
 };
 
 void PC_bsf_ProcessResults_2(
-	bool* exit, // "true" if Stopping Criterion is satisfied, and "false" otherwise
 	PT_bsf_reduceElem_T_2* reduceResult,
 	int reduceCounter, // Number of successfully produced Elrments of Reduce List
 	PT_bsf_parameter_T* parameter, // Current Approximation
-	int* newJobCase
-	) {
+	int* nextJob,
+	bool* exit // "true" if Stopping Criterion is satisfied, and "false" otherwise
+) {
 	// optional filling
 };
 
 void PC_bsf_ProcessResults_3(
-	bool* exit, // "true" if Stopping Criterion is satisfied, and "false" otherwise
 	PT_bsf_reduceElem_T_3* reduceResult,
 	int reduceCounter, // Number of successfully produced Elrments of Reduce List
 	PT_bsf_parameter_T* parameter, // Current Approximation
-	int* newJobCase
-	) {
+	int* nextJob,
+	bool* exit // "true" if Stopping Criterion is satisfied, and "false" otherwise
+) {
 	// optional filling
 };
 
-void PC_bsf_ParametersOutput(int numOfWorkers, PT_bsf_parameter_T parameter) {
-	cout << "=================================================== Jacobi M ====================================================" << endl;
-	cout << "Number of Workers: " << numOfWorkers << endl;
+void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
+	cout << "===================================== BSF-Gravity =====================================" << endl;
+	cout << "Number of Workers: " << BSF_sv_numOfWorkers << endl;
 #ifdef PP_BSF_OMP
 #ifdef PP_BSF_NUM_THREADS
 	cout << "Number of Threads: " << PP_BSF_NUM_THREADS << endl;
@@ -175,8 +155,6 @@ void PC_bsf_ParametersOutput(int numOfWorkers, PT_bsf_parameter_T parameter) {
 #else
 	cout << "OpenMP is turned off!" << endl;
 #endif // PP_BSF_OMP
-	cout << "===================================== BSF-Gravity =====================================" << endl;
-	cout << "Number of workers: " << numOfWorkers << endl;
 	cout << "Number of large mass points: " << PP_N << endl;
 	cout << "---------- X mass point -----------" << endl;
 	cout << "Initial coordinates:\t";
@@ -201,9 +179,16 @@ void PC_bsf_ParametersOutput(int numOfWorkers, PT_bsf_parameter_T parameter) {
 	cout << "___________________________________________________________________________" << endl;
 };
 
+void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* parameterOutP) {
+	for (int i = 0; i < PP_SPACE_DIMENSION; i++) {
+		parameterOutP->coordinates[i] = parameterIn.coordinates[i];
+		parameterOutP->velosity[i] = parameterIn.velosity[i];
+	}
+};
+
 void PC_bsf_IterOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
 	double elapsedTime, int jobCase) {
-	cout << "------------------ " << PP_BSF_iterCounter << " ------------------" << endl;
+	cout << "------------------ " << BSF_sv_iterCounter << " ------------------" << endl;
 	cout << "Coordinates:\t";
 	for (int j = 0; j < PP_SPACE_DIMENSION; j++)
 		cout << parameter.coordinates[j] << "\t";
@@ -216,21 +201,21 @@ void PC_bsf_IterOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_
 
 void PC_bsf_IterOutput_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
 	double elapsedTime, int jobCase) {
-	cout << "------------------ " << PP_BSF_iterCounter << " ------------------" << endl;
+	cout << "------------------ " << BSF_sv_iterCounter << " ------------------" << endl;
 	// optional filling
 
 };
 
 void PC_bsf_IterOutput_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
 	double elapsedTime, int jobCase) {
-	cout << "------------------ " << PP_BSF_iterCounter << " ------------------" << endl;
+	cout << "------------------ " << BSF_sv_iterCounter << " ------------------" << endl;
 	// optional filling
 
 };
 
 void PC_bsf_IterOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
 	double elapsedTime, int jobCase) {
-	cout << "------------------ " << PP_BSF_iterCounter << " ------------------" << endl;
+	cout << "------------------ " << BSF_sv_iterCounter << " ------------------" << endl;
 	// optional filling
 
 };
@@ -271,9 +256,17 @@ void PC_bsf_SetInitParameter(PT_bsf_parameter_T* parameter) {
 	};
 };
 
-void PC_bsf_SetMapSubList(PT_bsf_mapElem_T* sublist, int sublistLength, int offset, bool* success) {
+void PC_bsf_SetMapSubList(PT_bsf_mapElem_T* sublist, int sublistLength, int offset) {
 	for (int j = 0; j < sublistLength; j++)
 		sublist[j].massPointNo = j + offset;
 };
 
-//----------------------------- User functions -----------------------------
+//----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
+void PC_bsfAssignAddressOffset(int value) { BSF_sv_addressOffset = value; }
+void PC_bsfAssignIterCounter(int value) { BSF_sv_iterCounter = value; }
+void PC_bsfAssignJobCase(int value) { BSF_sv_jobCase = value; }
+void PC_bsfAssignMpiRank(int value) { BSF_sv_mpiRank = value; }
+void PC_bsfAssignNumberInSublist(int value) { BSF_sv_numberInSublist = value; }
+void PC_bsfAssignNumOfWorkers(int value) { BSF_sv_numOfWorkers = value; }
+void PC_bsfAssignParameter(PT_bsf_parameter_T parameter) { PC_bsf_CopyParameter(parameter, &BSF_sv_parameter); }
+void PC_bsfAssignSublistLength(int value) { BSF_sv_sublistLength = value; }

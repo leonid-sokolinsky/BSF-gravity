@@ -6,7 +6,6 @@ Prefix: PP
 Author: Leonid B. Sokolinsky
 This source code is a part of BSF Skeleton
 ==============================================================================*/
-#pragma once
 
 //=========================== Problem Parameters =========================
 #define PP_SPACE_DIMENSION 3	// Dimension of space = 3 (change is prohibited)

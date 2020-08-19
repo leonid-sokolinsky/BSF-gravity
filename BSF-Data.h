@@ -26,8 +26,6 @@ static int	BD_tailLength;		// Length of the remainder of the list after dividing
 // ========================= Time Variables ========================
 static double BD_t;				// Total time
 static int BD_iterCounter;
-// ========================= Parameter stuctures ========================
-static PT_bsf_parameter_T BD_parameter;
 // ========================= Lists ========================
 BT_extendedReduceElem_T*	BD_extendedReduceList; 
 BT_extendedReduceElem_T_1*	BD_extendedReduceList_1;
@@ -38,7 +36,7 @@ BT_extendedReduceElem_T_1*	BD_extendedReduceResult_P_1;
 BT_extendedReduceElem_T_2*	BD_extendedReduceResult_P_2;
 BT_extendedReduceElem_T_3*	BD_extendedReduceResult_P_3;
 PT_bsf_mapElem_T*			BD_mapSubList;
-BT_order_T					BD_order[PP_MAX_MPI_SIZE];		// Orders for Workers
+BT_order_T					BD_order;		// Order for Workers
 MPI_Status					BD_status[PP_MAX_MPI_SIZE];		// MPI ststus
 MPI_Request					BD_request[PP_MAX_MPI_SIZE];	// MPI request
 int							BD_sublistSize[PP_MAX_MPI_SIZE];// SubList Sizes for Workers
