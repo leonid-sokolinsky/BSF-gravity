@@ -8,6 +8,7 @@ This source code is a part of BSF Skeleton
 ==============================================================================*/
 #include "Problem-Data.h"			// Problem Types 
 #include "Problem-Forwards.h"		// Problem Function Forwards
+#include "Problem-bsfParameters.h"	// BSF-skeleton parameters
 #include "BSF-SkeletonVariables.h"	// Skeleton Variables
 using namespace std;
 
