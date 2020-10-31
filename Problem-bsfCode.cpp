@@ -168,7 +168,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << endl;
 	cout << "Mass:\t" << PD_X.mass << endl;
 
-	cout << "---------- Y mass points -----------" << endl;
+	/* debug *//*cout << "---------- Y mass points -----------" << endl;
 	for (int i = 0; i < PF_MIN(PP_OUTPUT_LIMIT, PP_N); i++) {
 		cout << "PD_Y[" << i << "].coordinates:\t";
 		for (int j = 0; j < PP_SPACE_DIMENSION; j++)
@@ -243,24 +243,23 @@ void PC_bsf_ProblemOutput_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCount
 void PC_bsf_ProblemOutput_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
 	double t) {// Output Function
 	// optional filling
-};
+}
 
 void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
 	double t) {// Output Function
 	// optional filling
-};
+}
 
 void PC_bsf_SetInitParameter(PT_bsf_parameter_T* parameter) {
 	for (int j = 0; j < PP_SPACE_DIMENSION; j++) {
 		parameter->coordinates[j] = PD_X.coordinates[j];
 		parameter->velosity[j] = PD_X.velosity[j];
-	};
-};
+	}
+}
 
-void PC_bsf_SetMapSubList(PT_bsf_mapElem_T* sublist, int sublistLength, int offset) {
-	for (int j = 0; j < sublistLength; j++)
-		sublist[j].massPointNo = j + offset;
-};
+void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
+	elem->massPointNo = i;
+}
 
 //----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
 void PC_bsfAssignAddressOffset(int value) { BSF_sv_addressOffset = value; }
