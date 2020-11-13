@@ -16,7 +16,3 @@ struct PT_smallMassPoint_T {
 	double acceleration[PP_SPACE_DIMENSION];
 	double mass;
 };
-struct PT_largeMassPoint_T {
-	double coordinates[PP_SPACE_DIMENSION];
-	double mass;
-};

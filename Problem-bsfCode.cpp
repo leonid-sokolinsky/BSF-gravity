@@ -28,14 +28,6 @@ void PC_bsf_Init(bool* success) { // success=false if initialization is unsucces
 		PD_X.velosity[j] = PP_VELOSITY;
 		PD_X.acceleration[j] = 0;
 	};
-
-	// Generating PD_Y[*]
-	for (int j = 0; j < PP_SPACE_DIMENSION; j++)
-		for (int l = 0; l < PP_NUNBER_OF_LARGE_MASS_POINTS; l++)
-			PD_Y[l + j * PP_NUNBER_OF_LARGE_MASS_POINTS].coordinates[j] = (l + 1) * PP_STEP;
-	for (int i = 0; i < PP_N; i++)
-		PD_Y[i].mass = PP_BIG_MASS;
-
 	return;
 }
 
@@ -47,15 +39,15 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem,
 	int* success // 1 - reduceElem was produced successfully (default); 0 - otherwise
 ) {
 	double squareOfNorm = 0;
-	for (int i = 0; i < PP_SPACE_DIMENSION; i++) {
+	for (int j = 0; j < PP_SPACE_DIMENSION; j++) {
 		double difference;
-		difference = PD_Y[mapElem->massPointNo].coordinates[i] - PD_X.coordinates[i];
+		difference = mapElem->coordinates[j] - PD_X.coordinates[j];
 		squareOfNorm += difference * difference;
 	}
 
-	for (int i = 0; i < PP_SPACE_DIMENSION; i++) {
-		reduceElem->acceleration[i] = PP_GRAVITATIONAL_CONSTANT * PD_Y[mapElem->massPointNo].mass
-			* (PD_Y[mapElem->massPointNo].coordinates[i] - PD_X.coordinates[i]) / squareOfNorm;
+	for (int j = 0; j < PP_SPACE_DIMENSION; j++) {
+		reduceElem->acceleration[j] = PP_GRAVITATIONAL_CONSTANT * mapElem->mass
+			* (mapElem->coordinates[j] - PD_X.coordinates[j]) / squareOfNorm;
 	}
 }
 
@@ -157,6 +149,14 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "OpenMP is turned off!" << endl;
 #endif // PP_BSF_OMP
 	cout << "Number of large mass points: " << PP_N << endl;
+#ifdef PP_LARGE_MASS_POINTS_OUTPUT
+	cout << "------- Y Mass Points: Coordinates & Mass -------" << endl;
+	for (int i = 0; i < PP_N; i++) {
+		for (int j = 0; j < PP_SPACE_DIMENSION; j++)
+			cout << setw(7) << Y_Coordinates(i, j);
+		cout << setw(7) << Y_Mass(i) << endl;
+	}
+#endif // PP_LARGE_MASS_POINTS_OUTPUT
 	cout << "---------- X mass point -----------" << endl;
 	cout << "Initial coordinates:\t";
 	for (int j = 0; j < PP_SPACE_DIMENSION; j++)
@@ -258,7 +258,9 @@ void PC_bsf_SetInitParameter(PT_bsf_parameter_T* parameter) {
 }
 
 void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
-	elem->massPointNo = i;
+	for (int j = 0; j < PP_SPACE_DIMENSION; j++)
+		elem->coordinates[j] = Y_Coordinates(i, j);
+	elem->mass = Y_Mass(i);
 }
 
 //----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
@@ -270,3 +272,19 @@ void PC_bsfAssignNumberInSublist(int value) { BSF_sv_numberInSublist = value; }
 void PC_bsfAssignNumOfWorkers(int value) { BSF_sv_numOfWorkers = value; }
 void PC_bsfAssignParameter(PT_bsf_parameter_T parameter) { PC_bsf_CopyParameter(parameter, &BSF_sv_parameter); }
 void PC_bsfAssignSublistLength(int value) { BSF_sv_sublistLength = value; }
+
+//---------------------- Yser functions ---------------------------
+inline double Y_Coordinates(int i, int j) {
+	int m = i / PP_NUNBER_OF_LARGE_MASS_POINTS_PER_DIMENSION;
+	if (j != m) return 0;
+	int l = i % PP_NUNBER_OF_LARGE_MASS_POINTS_PER_DIMENSION;
+	return (l + 1) * PP_STEP;
+}
+
+inline double Y_Mass(int i) {
+	return PP_BIG_MASS;
+}
+
+
+
+

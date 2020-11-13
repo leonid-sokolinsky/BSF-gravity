@@ -10,4 +10,3 @@ This source code is a part of BSF Skeleton
 
 //========================== Problem structures ====================================
 static PT_smallMassPoint_T PD_X;
-static PT_largeMassPoint_T PD_Y[PP_N];

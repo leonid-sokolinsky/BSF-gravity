@@ -16,7 +16,8 @@ struct PT_bsf_parameter_T {			// Parameter for workers
 };
 
 struct PT_bsf_mapElem_T {			// Element of map list
-	int massPointNo;
+	double coordinates[PP_SPACE_DIMENSION];
+	double mass;
 };
 
 struct PT_bsf_reduceElem_T {			// Element of reduce list	
