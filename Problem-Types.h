@@ -14,5 +14,4 @@ struct PT_smallMassPoint_T {
 	double coordinates[PP_SPACE_DIMENSION];
 	double velosity[PP_SPACE_DIMENSION];
 	double acceleration[PP_SPACE_DIMENSION];
-	double mass;
 };

@@ -22,7 +22,6 @@ void PC_bsf_Init(bool* success) { // success=false if initialization is unsucces
 		return;
 	}
 
-	PD_X.mass = PP_SMALL_MASS;
 	for (int j = 0; j < PP_SPACE_DIMENSION; j++) {
 		PD_X.coordinates[j] = 0;
 		PD_X.velosity[j] = PP_VELOSITY;
@@ -174,7 +173,6 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	for (int j = 0; j < PP_SPACE_DIMENSION; j++)
 		cout << parameter.velosity[j] << "\t";
 	cout << endl;
-	cout << "Mass:\t" << PD_X.mass << endl;
 
 	/* debug *//*cout << "---------- Y mass points -----------" << endl;
 	for (int i = 0; i < PF_MIN(PP_OUTPUT_LIMIT, PP_N); i++) {

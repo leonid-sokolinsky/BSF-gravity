@@ -16,7 +16,6 @@ This source code is a part of BSF Skeleton
 #define PP_TIME_SLOT 1				// \Delta t (in sec.)        
 #define PP_GRAVITATIONAL_CONSTANT 6.67408E-11		// Gravitational Constant
 #define PP_VELOSITY 1			// Initial velosity of small mass point PD_X
-#define PP_SMALL_MASS 10			// Mass of small mass point PD_X
 #define PP_BIG_MASS 1E12			// Mass of bvig mass point PD_Y[*]
 //-------------------------- Outpoot Parameters ---------------------------
 #define PP_ITER_COUNT 10			
